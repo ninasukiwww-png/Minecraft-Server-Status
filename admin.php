@@ -106,229 +106,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= SITE_TITLE ?> - 管理员后台</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .logout-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-        .success {
-            color: green;
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #e8f5e9;
-            border-radius: 4px;
-        }
-        .error {
-            color: red;
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #ffebee;
-            border-radius: 4px;
-        }
-        .form-container {
-            margin-bottom: 30px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        
-        /* 美化服务器类型选择下拉菜单 */
-        .form-group select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            background-color: white;
-            background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%234CAF50"%3E%3Cpath fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/%3E%3C/svg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 20px;
-            appearance: none;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .form-group select:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-        }
-        
-        /* 美化选项样式 */
-        .form-group select option {
-            padding: 10px;
-            background-color: white;
-            color: #333;
-        }
-        
-        .form-group select option:hover {
-            background-color: #f9f9f9;
-        }
-        .btn {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .action-btn {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .edit-btn {
-            background-color: #2196F3;
-            color: white;
-        }
-        .edit-btn:hover {
-            background-color: #0b7dda;
-        }
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
-        }
-        .delete-btn:hover {
-            background-color: #d32f2f;
-        }
-        
-        /* 滑动开关样式 */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
-        
-        input:checked + .slider {
-            background-color: #4CAF50;
-        }
-        
-        input:focus + .slider {
-            box-shadow: 0 0 1px #4CAF50;
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        /* 圆角开关 */
-        .slider.round {
-            border-radius: 34px;
-        }
-        
-        .slider.round:before {
-            border-radius: 50%;
-        }
-    </style>
+    <title><?= SITE_TITLE ?> · 管理</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-    <div class="container">
+<body class="admin-page">
+    <div class="admin-container">
         <div class="header">
             <h1>服务器管理</h1>
-            <div style="display: flex; gap: 10px;">
-                <a href="index.php" class="logout-btn">回到主页</a>
-                  <a href="view_logs.php" class="logout-btn">查看日志</a>
-                  <a href="api_management.php" class="logout-btn">API管理</a>
-                  <!-- 获取API最新信息功能已整合到API管理页面 -->
-                <a href="logout.php" class="logout-btn">退出登录</a>
+            <div class="nav-links">
+                <a href="index.php" class="nav-btn">回到主页</a>
+                <a href="view_logs.php" class="nav-btn">查看日志</a>
+                <a href="api_management.php" class="nav-btn">API管理</a>
+                <a href="logout.php" class="nav-btn danger">退出登录</a>
             </div>
         </div>
 
@@ -394,7 +186,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
                     <?= $edit_server ? '更新服务器' : '添加服务器' ?>
                 </button>
                 <?php if ($edit_server): ?>
-                    <a href="admin.php" class="btn" style="background-color: #ccc; margin-left: 10px;">取消编辑</a>
+                    <a href="admin.php" class="btn">取消编辑</a>
                 <?php endif; ?>
             </form>
         </div>

@@ -131,351 +131,79 @@ $selected_bedrock_api = isset($selected_apis['selected_bedrock_api']) ? $selecte
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= SITE_TITLE ?> - API管理</title>
-    <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --accent-color: #e74c3c;
-            --text-color: #333;
-            --light-text: #666;
-            --background-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --border-color: #e0e0e0;
-            --success-color: #27ae60;
-            --success-bg: #d5f5e3;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .success-alert {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error-alert {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            font-size: 28px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        h2 {
-            color: var(--text-color);
-            font-size: 22px;
-            margin: 25px 0 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--border-color);
-            font-weight: 500;
-        }
-
-        h3 {
-            color: var(--light-text);
-            font-size: 18px;
-            margin: 20px 0 10px;
-            font-weight: 500;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .back-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .back-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-        }
-
-        .success {
-            color: var(--success-color);
-            margin-bottom: 20px;
-            padding: 12px 15px;
-            background-color: var(--success-bg);
-            border-radius: 6px;
-            border-left: 4px solid var(--success-color);
-            font-weight: 500;
-        }
-
-        .api-list {
-            margin-bottom: 30px;
-        }
-
-        .api-item {
-            padding: 20px;
-            margin-bottom: 15px;
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            border-left: 4px solid var(--secondary-color);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .api-item:hover {
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-3px);
-        }
-
-        .api-name {
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 18px;
-            color: var(--text-color);
-        }
-
-        .api-url {
-            color: var(--primary-color);
-            word-break: break-all;
-            margin-bottom: 8px;
-            display: block;
-            font-size: 14px;
-        }
-
-        .api-website {
-            margin-top: 10px;
-        }
-
-        .api-website a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .api-website a:hover {
-            text-decoration: underline;
-            opacity: 0.9;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-color);
-        }
-
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            box-sizing: border-box;
-            background-color: var(--card-bg);
-            font-size: 14px;
-            transition: var(--transition);
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-        }
-
-        .form-group select:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            font-size: 16px;
-        }
-
-        .btn.save-btn {
-            background-color: var(--primary-color);
-            color: white;
-            margin-right: 10px;
-        }
-
-        .btn.fetch-btn {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .btn:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
-        }
-
-        .api-selection {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .back-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+    <title><?= SITE_TITLE ?> · API管理</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-    <div class="container">
+<body class="admin-page">
+    <div class="admin-container">
         <div class="header">
             <h1>API管理</h1>
-
-        <!-- 操作结果提示 -->
-        <?php if (isset($success)): ?>
-            <div class="alert success-alert"><?php echo $success; ?></div>
-        <?php endif; ?>
-        <?php if (isset($error)): ?>
-            <div class="alert error-alert"><?php echo $error; ?></div>
-        <?php endif; ?>
-            <a href="admin.php" class="back-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                返回管理页面
-            </a>
+            <div class="nav-links">
+                <a href="admin.php" class="nav-btn">← 返回管理页面</a>
+            </div>
         </div>
 
         <?php if (isset($success)): ?>
             <div class="success"><?= $success ?></div>
         <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="error"><?= $error ?></div>
+        <?php endif; ?>
 
-        <div class="api-selection">
-            <h2>选择API</h2>
-            <form method="post" action="api_management.php">
-                <div class="form-group">
-                    <label for="java_api">Java版服务器API:</label>
-                    <select id="java_api" name="java_api">
-                        <?php foreach ($java_apis as $api): ?>
-                            <option value="<?= $api['api_url'] ?>" <?= ($api['api_url'] === $selected_java_api) ? 'selected' : '' ?>><?= $api['name'] ?> (<?= $api['api_url'] ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+        <h2>选择API</h2>
+        <form method="post" action="api_management.php" class="form-container">
+            <div class="form-group">
+                <label for="java_api">Java版服务器API:</label>
+                <select id="java_api" name="java_api">
+                    <?php foreach ($java_apis as $api): ?>
+                        <option value="<?= $api['api_url'] ?>" <?= ($api['api_url'] === $selected_java_api) ? 'selected' : '' ?>><?= $api['name'] ?> (<?= $api['api_url'] ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-                <div class="form-group">
-                    <label for="bedrock_api">基岩版服务器API:</label>
-                    <select id="bedrock_api" name="bedrock_api">
-                        <?php foreach ($bedrock_apis as $api): ?>
-                            <option value="<?= $api['api_url'] ?>" <?= ($api['api_url'] === $selected_bedrock_api) ? 'selected' : '' ?>><?= $api['name'] ?> (<?= $api['api_url'] ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="bedrock_api">基岩版服务器API:</label>
+                <select id="bedrock_api" name="bedrock_api">
+                    <?php foreach ($bedrock_apis as $api): ?>
+                        <option value="<?= $api['api_url'] ?>" <?= ($api['api_url'] === $selected_bedrock_api) ? 'selected' : '' ?>><?= $api['name'] ?> (<?= $api['api_url'] ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-                <button type="submit" name="save_api_selection" class="btn save-btn">保存选择</button>
-            <button type="submit" name="fetch_api_info" class="btn fetch-btn">获取API最新信息</button>
-            </form>
-        </div>
+            <button type="submit" name="save_api_selection" class="btn">保存选择</button>
+            <button type="submit" name="fetch_api_info" class="btn" style="background: rgba(76,175,80,0.20); color: #81c784;">获取API最新信息</button>
+        </form>
 
+        <h2>API信息</h2>
         <div class="api-list">
-            <h2>API信息</h2>
             <?php if (empty($api_data['routes'])): ?>
-                <p>没有可用的API信息，请先获取API最新信息。</p>
+                <p style="color: rgba(200,235,250,0.6);">没有可用的API信息，请先获取API最新信息。</p>
             <?php else: ?>
-                <h3>Java版API</h3>
+                <h3 style="font-family: var(--font-title); font-weight: 400; color: rgba(200,235,250,0.7); margin: 1rem 0 0.6rem;">Java版API</h3>
                 <?php if (empty($java_apis)): ?>
-                    <p>没有可用的Java版API。</p>
+                    <p style="color: rgba(200,235,250,0.6);">没有可用的Java版API。</p>
                 <?php else: ?>
                     <?php foreach ($java_apis as $api): ?>
                         <div class="api-item">
-                            <div class="api-name"><?= $api['name'] ?></div>
-                            <div class="api-url"><?= $api['api_url'] ?></div>
-                            <div class="api-website">官方网站: <a href="<?= $api['website'] ?>" target="_blank"><?= $api['website'] ?></a></div>
+                            <div class="api-info" style="font-weight: 600;"><?= $api['name'] ?></div>
+                            <div class="api-info"><small><?= $api['api_url'] ?></small></div>
+                            <div class="api-website" style="margin-top: 0.4rem;"><a href="<?= $api['website'] ?>" target="_blank" style="color: var(--color-accent); font-size: 0.85rem;">官方网站</a></div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
 
-                <h3>基岩版API</h3>
+                <h3 style="font-family: var(--font-title); font-weight: 400; color: rgba(200,235,250,0.7); margin: 1rem 0 0.6rem;">基岩版API</h3>
                 <?php if (empty($bedrock_apis)): ?>
-                    <p>没有可用的基岩版API。</p>
+                    <p style="color: rgba(200,235,250,0.6);">没有可用的基岩版API。</p>
                 <?php else: ?>
                     <?php foreach ($bedrock_apis as $api): ?>
                         <div class="api-item">
-                            <div class="api-name"><?= $api['name'] ?></div>
-                            <div class="api-url"><?= $api['api_url'] ?></div>
-                            <div class="api-website">官方网站: <a href="<?= $api['website'] ?>" target="_blank"><?= $api['website'] ?></a></div>
+                            <div class="api-info" style="font-weight: 600;"><?= $api['name'] ?></div>
+                            <div class="api-info"><small><?= $api['api_url'] ?></small></div>
+                            <div class="api-website" style="margin-top: 0.4rem;"><a href="<?= $api['website'] ?>" target="_blank" style="color: var(--color-accent); font-size: 0.85rem;">官方网站</a></div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>

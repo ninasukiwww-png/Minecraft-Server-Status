@@ -30,353 +30,54 @@ $minecraft_api = new MinecraftAPI();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= SITE_TITLE ?></title>
+    <title><?= SITE_TITLE ?> · SnowBlock</title>
+    <meta name="description" content="SnowBlock MC 服务器状态监控 — 在线人数、版本、延迟信息一览">
+    <meta name="theme-color" content="#0b2b3b">
+    <meta name="color-scheme" content="light dark">
+    <meta property="og:title" content="<?= SITE_TITLE ?> · SnowBlock">
+    <meta property="og:description" content="SnowBlock MC 服务器状态监控">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="SnowBlock">
+    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/ninasukiwww-png/my-images/main/status/avatar.webp">
     <?= $chartjs_script ?>
-    <style>
-        /* 全局样式重置和基础设置 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            animation: fadeIn 0.8s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .login-link {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        
-        .login-link a {
-            color: #2196F3;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .login-link a:hover {
-            background-color: #2196F3;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
-        }
-        
-        /* 服务器网格布局 */
-        .server-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        /* 服务器卡片样式 */
-        .server-card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            overflow: visible;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            border: 1px solid #e0e0e0;
-            z-index: 1;
-        }
-        
-        .server-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* 服务器头部样式 - 根据状态变化 */
-        .server-header {
-            padding: 15px;
-            color: white;
-            display: flex;
-            align-items: center;
-            min-height: 80px;
-            transition: background-color 0.3s ease;
-        }
-        
-        .server-header.online {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-        }
-        
-        .server-header.offline {
-            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
-        }
-        
-        /* 基岩版服务器特殊样式 */
-        .server-header.bedrock {
-            background: linear-gradient(135deg, #2196F3 0%, #0b7dda 100%);
-        }
-        
-        .server-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 10px;
-            margin-right: 15px;
-            background-color: #fff;
-            padding: 3px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-        }
-        
-        .server-card:hover .server-icon {
-            transform: scale(1.05);
-        }
-        
-        .server-name {
-            font-size: 18px;
-            font-weight: bold;
-            flex: 1;
-        }
-        
-        .server-status {
-            margin-left: auto;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-        }
-        
-        /* 服务器主体内容 */
-        .server-body {
-            padding: 15px;
-        }
-        
-        .server-info {
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .server-card:hover .server-info {
-            transform: translateX(5px);
-        }
-        
-        .server-info label {
-            font-weight: bold;
-            color: #666;
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        
-        .server-info p {
-            margin: 0;
-            color: #333;
-            font-size: 1.05em;
-        }
-        
-        /* 服务器类型标签 */
-        .server-type-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 500;
-            margin-top: 5px;
-        }
-        
-        .server-type-badge.java {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .server-type-badge.bedrock {
-            background-color: #e3f2fd;
-            color: #1565c0;
-        }
-        
-        /* 改进的MOTD显示 */
-        .server-motd {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: auto;
-            margin-bottom: 0;
-            font-style: normal;
-            line-height: 1.6;
-            white-space: normal;
-            overflow-wrap: break-word;
-            text-align: center;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
-            border: 1px solid #1a252f;
-            height: 80px; /* 设置固定高度 */
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        
-        /* 服务器卡片样式优化 */
-        .server-card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            overflow: visible;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            border: 1px solid #e0e0e0;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 300px; /* 设置最小高度 */
-        }
-        
-        .server-body {
-            padding: 15px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .player-list {
-            display: none; /* 隐藏玩家列表区域 */
-        }
-        
-        .player-list h4 {
-            color: #fff;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            font-weight: normal;
-        }
-        
-        .player-names {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .player-tag {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            transition: background-color 0.3s ease;
-        }
-        
-        .player-tag:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .no-players {
-            color: rgba(255, 255, 255, 0.7);
-            font-style: italic;
-            font-size: 0.9em;
-        }
-        
-        /* 复制IP按钮 */
-        .copy-ip-btn {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-top: 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .copy-ip-btn:hover {
-            background-color: #1976D2;
-            transform: translateY(-1px);
-        }
-        
-        .copy-ip-btn.copied {
-            background-color: #4CAF50;
-        }
-        
-        /* 无服务器提示 */
-        .no-servers {
-            text-align: center;
-            padding: 60px 40px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 40px;
-        }
-        
-        .no-servers h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-        
-        .no-servers p {
-            color: #7f8c8d;
-            font-size: 1.1em;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .server-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .container {
-                padding: 10px;
-            }
-        }
-        
-        /* 加载动画 */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 style="cursor: pointer;"><a href="login.php" style="color: inherit; text-decoration: none;"><?= SITE_TITLE ?></a></h1>
+
+<div id="loader">
+    <div class="loader-crystal">
+        <div class="crystal-wrapper">
+            <div class="crystal-glow"></div>
+            <svg class="crystal-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path class="main-line" stroke="#8fd8ef" stroke-width="2.2" stroke-linecap="round" fill="none" d="M50 5 L50 95 M50 5 L75 25 L50 50 M50 5 L25 25 L50 50 M50 95 L75 75 L50 50 M50 95 L25 75 L50 50 M50 50 L95 50 M75 25 L95 50 M25 25 L5 50 M75 75 L95 50 M25 75 L5 50" />
+                <path class="inner-line" stroke="#c0f0ff" stroke-width="1.4" stroke-linecap="round" fill="none" d="M50 15 L50 85 M50 15 L65 30 L50 50 M50 15 L35 30 L50 50 M50 85 L65 70 L50 50 M50 85 L35 70 L50 50 M50 50 L85 50 M65 30 L85 50 M35 30 L15 50 M65 70 L85 50 M35 70 L15 50" />
+                <path class="core-line" stroke="#ffe6b0" stroke-width="1.8" stroke-linecap="round" fill="none" d="M50 38 L50 62 M50 38 L57 44 L50 50 M50 38 L43 44 L50 50 M50 62 L57 56 L50 50 M50 62 L43 56 L50 50 M50 50 L62 50 M57 44 L62 50 M43 44 L38 50 M57 56 L62 50 M43 56 L38 50" />
+            </svg>
+        </div>
+        <div class="loader-text-frost">正在连接雪境</div>
+        <div class="loader-dots">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</div>
+
+<canvas id="snowCanvas" aria-hidden="true"></canvas>
+
+<div class="toast" id="toast" aria-live="polite"></div>
+
+<div class="container">
+    <header class="page-header">
+        <h1><?= SITE_TITLE ?></h1>
+        <p class="sub">
+            <a href="admin.php">管理</a>
+            <span class="dot">·</span>
+            MC 服务器状态监控
+        </p>
+    </header>
 
         <?php if ($servers->num_rows > 0): ?>
             
@@ -1310,288 +1011,23 @@ $minecraft_api = new MinecraftAPI();
         });
     </script>
 
-    <style>
-        /* 图表按钮容器样式 */
-        .chart-button-container {
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-        }
-        
-        /* 图表按钮样式 */
-        .show-chart-btn {
-            background: linear-gradient(135deg, #2196F3 0%, #0b7dda 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .show-chart-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-        }
-        
-        /* 图表容器样式 */
-        .chart-container {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            margin-top: 0;
-            margin-bottom: 15px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e0e0e0;
-            border-top: none;
-            z-index: 100;
-            transform-origin: top center;
-            transform: scaleY(0.95);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        
-        .chart-container[style*='display: block'] {
-            opacity: 1;
-            transform: scaleY(1);
-        }
-        
-        /* 模态框样式 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow: hidden;
-            animation: slideUp 0.3s ease;
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h3 {
-            margin: 0;
-            color: #333;
-            display: flex;
-            align-items: center;
-        }
-        
-        .modal-title-icon {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 8px;
-            width: 64px;
-            height: 64px;
-            border-radius: 10px;
-            background-color: #fff;
-            padding: 3px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-        
-        .close-btn:hover {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        
-        .modal-body {
-            padding: 20px;
-            max-height: calc(80vh - 120px);
-            overflow-y: auto;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* 确保图表容器在模态框中有合适的高度 */
-        .modal-body .chart-wrapper {
-            height: 300px;
-            margin: 20px 0;
-        }
-        
-        .modal-body .chart-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .chart-container h4 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        .chart-wrapper {
-            position: relative;
-            height: 200px;
-            margin-bottom: 10px;
-        }
-        
-        .chart-controls {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-        }
-        
-        .chart-btn {
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .chart-btn:hover {
-            background-color: #e9e9e9;
-        }
-        
-        .chart-btn.active {
-            background-color: #4CAF50;
-            color: white;
-            border-color: #4CAF50;
-        }
-        
-        /* 日期选择器样式 */
-        .date-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .date-selector label {
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        
-        .date-input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: white;
-            transition: border-color 0.2s ease;
-            min-width: 150px;
-        }
-        
-        .date-input:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
-        }
-        
-        .date-btn {
-            padding: 8px 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-        
-        .date-btn:hover {
-            background-color: #45a049;
-            transform: translateY(-1px);
-        }
-        
-        .date-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* 服务器卡片悬停效果 */
-        .server-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .server-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* 图表容器动画 */
-        .chart-container {
-            transition: opacity 0.3s ease;
-        }
-        
-        /* 未开启人数记录的提示样式 */
-        .no-history-message {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-style: italic;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            margin-top: 15px;
-        }
-    </style>
+
+<script>
+!function(){
+var l=document.getElementById('loader'),i=new Image,b=!1,m=!1;
+i.src='https://raw.githubusercontent.com/ninasukiwww-png/my-images/main/status/138936740_p0.webp';
+i.onload=function(){b=!0;f()};
+i.onerror=function(){b=!0;f()};
+setTimeout(function(){m=!0;f()},1500);
+setTimeout(function(){if(!l.classList.contains('hidden')){b=!0;m=!0;f()}},5000);
+function f(){if(b&&m&&!l.classList.contains('hidden')){l.classList.add('hidden');document.body.classList.add('bg-loaded');l.addEventListener('transitionend',function(){l.style.display='none'},{once:true})}}
+var n=document.getElementById('snowCanvas'),t=n.getContext('2d'),p=[],w,h;
+function rs(){w=n.width=innerWidth;h=n.height=innerHeight}
+function cp(){return{x:Math.random()*w,y:Math.random()*h-20,r:Math.random()*2.4+1,s:Math.random()*.6+.2,w:Math.random()*.3-.12,a:Math.random()*.4+.15}}
+function is(){p=Array.from({length:window.innerWidth<768?30:60},cp)}
+function ds(){t.clearRect(0,0,w,h);for(var e=0;e<p.length;e++){var o=p[e];t.beginPath(),t.arc(o.x,o.y,o.r,0,Math.PI*2),t.fillStyle='rgba(255,255,255,'+o.a+')',t.fill(),o.y+=o.s,o.x+=o.w,o.y>h+25&&(p[e]=cp()),o.x>w+20?o.x=-15:o.x<-20&&(o.x=w+10)}for(;p.length<(window.innerWidth<768?40:60);)p.push(cp());requestAnimationFrame(ds)}
+addEventListener('resize',rs);rs();is();ds();
+}();
+</script>
 </body>
 </html>

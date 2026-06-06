@@ -85,107 +85,41 @@ if (isset($_POST['clear_log'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>查看日志 - <?= SITE_TITLE ?></title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .header {
-            background-color: #333;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .nav {
-            background-color: #444;
-            padding: 10px 20px;
-        }
-        .nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 20px;
-        }
-        .nav a:hover {
-            text-decoration: underline;
-        }
-        .content {
-            padding: 20px;
-        }
-        .log-container {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            max-height: 500px;
-            overflow-y: auto;
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        .no-log {
-            color: #999;
-            text-align: center;
-            padding: 40px;
-        }
-        .action-bar {
-            margin-bottom: 15px;
-            text-align: right;
-        }
-        .btn {
-            padding: 8px 15px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .btn:hover {
-            background-color: #d32f2f;
-        }
-    </style>
+    <title><?= SITE_TITLE ?> · 日志</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-    <div class="container">
+<body class="admin-page">
+    <div class="admin-container">
         <div class="header">
             <h1>API调用日志</h1>
-            <div class="logout"><a href="logout.php" style="color: white;">退出登录</a></div>
-        </div>
-        <div class="nav">
-            <a href="admin.php">服务器管理</a>
-            <a href="view_logs.php">查看日志</a>
-            <a href="index.php">返回首页</a>
-        </div>
-        <div class="content">
-            <div class="action-bar">
-                <form method="post">
-                    <button type="submit" name="clear_log" class="btn" onclick="return confirm('确定要清空所有日志吗？');">清空日志</button>
-                </form>
+            <div class="nav-links">
+                <a href="admin.php" class="nav-btn">服务器管理</a>
+                <a href="view_logs.php" class="nav-btn">查看日志</a>
+                <a href="index.php" class="nav-btn">返回首页</a>
+                <a href="logout.php" class="nav-btn danger">退出登录</a>
             </div>
-            <div class="log-container">
-                <?php if (!empty($log_content)): ?>
-                    <?= htmlspecialchars($log_content) ?>
-                <?php else: ?>
-                    <div class="no-log">暂无日志记录</div>
-                <?php endif; ?>
-            </div>
+        </div>
+        <div class="log-list">
+            <form method="post" style="margin-bottom: 1rem; text-align: right;">
+                <button type="submit" name="clear_log" class="btn" onclick="return confirm('确定要清空所有日志吗？');">清空日志</button>
+            </form>
+            <?php if (!empty($log_content)): ?>
+                <?php
+                $log_lines = explode("\n", $log_content);
+                foreach ($log_lines as $line):
+                    if (empty(trim($line))) continue;
+                ?>
+                <div class="log-entry-line">
+                    <span class="log-time"><?= htmlspecialchars(mb_substr($line, 0, 19)) ?></span>
+                    <span class="log-message"><?= htmlspecialchars($line) ?></span>
+                </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="log-entry-line" style="text-align: center; color: rgba(200,235,250,0.4);">暂无日志记录</div>
+            <?php endif; ?>
         </div>
     </div>
 </body>

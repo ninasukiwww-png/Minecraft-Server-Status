@@ -177,83 +177,23 @@ $chart_player_lists = json_encode($playerLists);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线人数历史记录</title>
-    <!-- 引入Chart.js -->
+    <title>在线人数历史记录 · SnowBlock</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .chart-container {
-            position: relative;
-            height: 500px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        select, button {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        button:hover {
-            background-color: #f0f0f0;
-        }
-        .data-info {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 300px;
-            }
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>在线人数历史记录图表</h1>
+    <div class="install-container chart-standalone">
+        <header class="page-header">
+            <h1>在线人数历史记录图表</h1>
+        </header>
         
-        <div class="controls">
+        <div class="chart-controls" style="gap: 1rem; flex-wrap: wrap;">
             <div class="control-group">
                 <label for="server-select">选择服务器:</label>
-                <select id="server-select">
+                <select id="server-select" class="date-input">
                     <?php foreach ($servers as $id => $name): ?>
                         <option value="<?php echo $id; ?>" <?php echo ($id == $server_id) ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($name); ?>
@@ -264,7 +204,7 @@ $chart_player_lists = json_encode($playerLists);
             
             <div class="control-group">
                 <label for="view-mode-select">查看模式:</label>
-                <select id="view-mode-select">
+                <select id="view-mode-select" class="date-input">
                     <option value="aggregated" <?php echo ($view_mode === 'aggregated') ? 'selected' : ''; ?>>聚合数据</option>
                     <option value="raw" <?php echo ($view_mode === 'raw') ? 'selected' : ''; ?>>原始数据</option>
                 </select>
@@ -272,20 +212,20 @@ $chart_player_lists = json_encode($playerLists);
             
             <div class="control-group">
                 <label for="interval-select">时间间隔:</label>
-                <select id="interval-select" <?php echo ($view_mode !== 'aggregated') ? 'disabled' : ''; ?>>
+                <select id="interval-select" class="date-input" <?php echo ($view_mode !== 'aggregated') ? 'disabled' : ''; ?>>
                     <option value="hour" <?php echo ($interval === 'hour') ? 'selected' : ''; ?>>按小时</option>
                     <option value="day" <?php echo ($interval === 'day') ? 'selected' : ''; ?>>按天</option>
                 </select>
             </div>
             
-            <button id="refresh-btn">刷新图表</button>
+            <button id="refresh-btn" class="chart-btn" style="font-size: 0.85rem;">刷新图表</button>
         </div>
         
-        <div class="chart-container">
+        <div class="chart-wrapper" style="height: 400px;">
             <canvas id="playerHistoryChart"></canvas>
         </div>
         
-        <div class="data-info">
+        <div class="modal-note">
             显示数据点数量: <?php echo count($labels); ?>
             <?php if (count($labels) > 0 && $labels[0] !== '暂无数据'): ?>
                 | 时间范围: <?php echo $labels[0]; ?> 至 <?php echo end($labels); ?>
